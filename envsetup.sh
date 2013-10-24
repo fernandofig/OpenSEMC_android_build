@@ -142,10 +142,8 @@ function setpaths()
     unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
     local ARCH=$(get_build_var TARGET_ARCH)
 
-    if [ -v LINARO_PATH ]; then
-        export ANDROID_EABI_TOOLCHAIN=$LINARO_PATH
-        export ARM_EABI_TOOLCHAIN=$LINARO_PATH
-        export ARM_EABI_TOOLCHAIN_PATH=$LINARO_PATH
+    if [ -v LINARO_ANDROID_PATH ]; then
+        export ANDROID_EABI_TOOLCHAIN=$LINARO_ANDROID_PATH
     else
         # The gcc toolchain does not exists for windows/cygwin. In this case, do not reference it.
         case $ARCH in
@@ -164,7 +162,12 @@ function setpaths()
         if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
             export ANDROID_EABI_TOOLCHAIN=$gccprebuiltdir/$toolchaindir
         fi
+    fi
 
+    if [ -v LINARO_ARM_PATH ]; then
+        export ARM_EABI_TOOLCHAIN=$LINARO_ARM_PATH
+        export ARM_EABI_TOOLCHAIN_PATH=":$LINARO_ARM_PATH"
+    else
         case $ARCH in
             arm)
                 toolchaindir=arm/arm-eabi-4.6/bin
