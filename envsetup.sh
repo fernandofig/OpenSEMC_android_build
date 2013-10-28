@@ -188,6 +188,10 @@ function setpaths()
     export ANDROID_QTOOLS=$T/development/emulator/qtools
     export ANDROID_DEV_SCRIPTS=$T/development/scripts
     export ANDROID_BUILD_PATHS=$(get_build_var ANDROID_BUILD_PATHS):$ANDROID_QTOOLS:$ANDROID_TOOLCHAIN$ARM_EABI_TOOLCHAIN_PATH$CODE_REVIEWS:$ANDROID_DEV_SCRIPTS:
+    if [ -v LINARO_ANDROID_PATH ]; then
+        # Hack to give Linaro priority on search PATH
+        export ANDROID_BUILD_PATHS=`echo $ANDROID_BUILD_PATHS | sed -e 's!'$PWD'/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.6/bin!'$ANDROID_TOOLCHAIN'!'`
+    fi
     export PATH=$ANDROID_BUILD_PATHS$PATH
 
     unset ANDROID_JAVA_TOOLCHAIN
