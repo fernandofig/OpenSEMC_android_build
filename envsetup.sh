@@ -138,48 +138,40 @@ function setpaths()
     prebuiltdir=$(getprebuilt)
     gccprebuiltdir=$(get_abs_build_var ANDROID_GCC_PREBUILTS)
 
+    # The gcc toolchain does not exists for windows/cygwin. In this case, do not reference it.
     export ANDROID_EABI_TOOLCHAIN=
-    unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
     local ARCH=$(get_build_var TARGET_ARCH)
-
-    if [ -v LINARO_PATH ]; then
-        export ANDROID_EABI_TOOLCHAIN=$LINARO_PATH
-        export ARM_EABI_TOOLCHAIN=$LINARO_PATH
-        export ARM_EABI_TOOLCHAIN_PATH=$LINARO_PATH
-    else
-        # The gcc toolchain does not exists for windows/cygwin. In this case, do not reference it.
-        case $ARCH in
-            x86) toolchaindir=x86/i686-linux-android-4.6/bin
-                ;;
-            arm) toolchaindir=arm/arm-linux-androideabi-4.6/bin
-                ;;
-            mips) toolchaindir=mips/mipsel-linux-android-4.6/bin
-                ;;
-            *)
-                echo "Can't find toolchain for unknown architecture: $ARCH"
-                toolchaindir=xxxxxxxxx
-                ;;
-        esac
-
-        if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
-            export ANDROID_EABI_TOOLCHAIN=$gccprebuiltdir/$toolchaindir
-        fi
-
-        case $ARCH in
-            arm)
-                toolchaindir=arm/arm-eabi-4.6/bin
-                if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
-                     export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
-                     ARM_EABI_TOOLCHAIN_PATH=":$gccprebuiltdir/$toolchaindir"
-                fi
-                ;;
-            mips) toolchaindir=mips/mips-eabi-4.4.3/bin
-                ;;
-            *)
-                # No need to set ARM_EABI_TOOLCHAIN for other ARCHs
-                ;;
-        esac
+    case $ARCH in
+        x86) toolchaindir=x86/i686-linux-android-4.6/bin
+            ;;
+        arm) toolchaindir=arm/arm-linux-androideabi-4.6/bin
+            ;;
+        mips) toolchaindir=mips/mipsel-linux-android-4.6/bin
+            ;;
+        *)
+            echo "Can't find toolchain for unknown architecture: $ARCH"
+            toolchaindir=xxxxxxxxx
+            ;;
+    esac
+    if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
+        export ANDROID_EABI_TOOLCHAIN=$gccprebuiltdir/$toolchaindir
     fi
+
+    unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
+    case $ARCH in
+        arm)
+            toolchaindir=arm/arm-eabi-4.6/bin
+            if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
+                 export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
+                 ARM_EABI_TOOLCHAIN_PATH=":$gccprebuiltdir/$toolchaindir"
+            fi
+            ;;
+        mips) toolchaindir=mips/mips-eabi-4.4.3/bin
+            ;;
+        *)
+            # No need to set ARM_EABI_TOOLCHAIN for other ARCHs
+            ;;
+    esac
 
     export ANDROID_TOOLCHAIN=$ANDROID_EABI_TOOLCHAIN
     export ANDROID_QTOOLS=$T/development/emulator/qtools
