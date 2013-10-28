@@ -144,7 +144,15 @@ function setpaths()
     case $ARCH in
         x86) toolchaindir=x86/i686-linux-android-4.6/bin
             ;;
-        arm) toolchaindir=arm/arm-linux-androideabi-4.6/bin
+        arm)
+            rm -f $gccprebuiltdir/arm/arm-linux-androideabi
+            if [ -v LINARO_ANDROID_PATH ]; then
+                ln -s $LINARO_ANDROID_PATH $gccprebuiltdir/arm/arm-linux-androideabi
+            else
+                ln -s $gccprebuiltdir/arm/arm-linux-androideabi-4.6 $gccprebuiltdir/arm/arm-linux-androideabi
+            fi
+
+            toolchaindir=arm/arm-linux-androideabi/bin
             ;;
         mips) toolchaindir=mips/mipsel-linux-android-4.6/bin
             ;;
@@ -160,7 +168,14 @@ function setpaths()
     unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
     case $ARCH in
         arm)
-            toolchaindir=arm/arm-eabi-4.6/bin
+            rm -f $gccprebuiltdir/arm/arm-eabi
+            if [ -v LINARO_ARM_PATH ]; then
+                ln -s $LINARO_ARM_PATH $gccprebuiltdir/arm/arm-eabi
+            else
+                ln -s $gccprebuiltdir/arm/arm-eabi-4.6 $gccprebuiltdir/arm/arm-eabi
+            fi
+
+            toolchaindir=arm/arm-eabi/bin
             if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
                  export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
                  ARM_EABI_TOOLCHAIN_PATH=":$gccprebuiltdir/$toolchaindir"
